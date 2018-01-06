@@ -18,7 +18,10 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Cryptography;
 using System.Text;
+using Convert = System.Convert; 
 using System.Threading.Tasks;
+using static System.Text.Encoding;
+
 
 namespace ExchangeSharp
 {
@@ -56,7 +59,7 @@ namespace ExchangeSharp
         public static byte[] SecureStringToBytes(SecureString s)
         {
             string unsecure = SecureStringToString(s);
-            byte[] bytes = Encoding.ASCII.GetBytes(unsecure);
+            byte[] bytes = ASCII.GetBytes(unsecure);
             unsecure = null;
             return bytes;
         }
@@ -95,50 +98,49 @@ namespace ExchangeSharp
             return dtDateTime;
         }
 
-        public static double UnixTimestampFromDateTimeSeconds(this DateTime dt)
-        {
-            return (dt - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-        }
+        public static double UnixTimestampFromDateTimeSeconds(this DateTime dt) => 
+            (dt - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
 
-        public static double UnixTimestampFromDateTimeMilliseconds(this DateTime dt)
-        {
-            return (dt - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
-        }
+        public static double UnixTimestampFromDateTimeMilliseconds(this DateTime dt) => 
+            (dt - new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc)).TotalMilliseconds;
 
-        public static string SHA256Sign(string message, string key)
-        {
-            return new HMACSHA256(Encoding.UTF8.GetBytes(key)).ComputeHash(Encoding.UTF8.GetBytes(message)).Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
-        }
+        public static string SHA256Sign(string message, string key) => SHA256Sign(message, UTF8.GetBytes(key));
+
+        //public static string SHA256Sign(string message, string key)
+        //{
+        //    return SHA256Sign(message, UTF8.GetBytes(key));
+        //    //var hmacsha256 = new HMACSHA256(UTF8.GetBytes(key));
+        //    //return hmacsha256.ComputeHash(UTF8.GetBytes(message)).
+        //    //    Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
+        //}
 
         public static string SHA256Sign(string message, byte[] key)
         {
-            return new HMACSHA256(key).ComputeHash(Encoding.UTF8.GetBytes(message)).Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
+            return new HMACSHA256(key).ComputeHash(UTF8.GetBytes(message)).Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
         }
 
-        public static string SHA256SignBase64(string message, byte[] key)
-        {
-            return Convert.ToBase64String(new HMACSHA256(key).ComputeHash(Encoding.UTF8.GetBytes(message)));
-        }
+        public static string SHA256SignBase64(string message, byte[] key) => 
+            Convert.ToBase64String(new HMACSHA256(key).ComputeHash(UTF8.GetBytes(message)));
 
-        public static string SHA384Sign(string message, string key)
-        {
-            return new HMACSHA384(Encoding.UTF8.GetBytes(key)).ComputeHash(Encoding.UTF8.GetBytes(message)).Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
-        }
+        public static string SHA384Sign(string message, string key) => SHA384Sign(message, UTF8.GetBytes(key));
+        //{
+        //    return new HMACSHA384(UTF8.GetBytes(key)).ComputeHash(UTF8.GetBytes(message)).Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
+        //}
 
         public static string SHA384Sign(string message, byte[] key)
         {
-            return new HMACSHA384(key).ComputeHash(Encoding.UTF8.GetBytes(message)).Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
+            return new HMACSHA384(key).ComputeHash(UTF8.GetBytes(message)).Aggregate(new StringBuilder(), (sb, b) => sb.AppendFormat("{0:x2}", b), (sb) => sb.ToString());
         }
 
         public static string SHA384SignBase64(string message, byte[] key)
         {
-            return Convert.ToBase64String(new HMACSHA384(key).ComputeHash(Encoding.UTF8.GetBytes(message)));
+            return Convert.ToBase64String(new HMACSHA384(key).ComputeHash(UTF8.GetBytes(message)));
         }
 
         public static string SHA512Sign(string message, string key)
         {
-            var hmac = new HMACSHA512(Encoding.ASCII.GetBytes(key));
-            var messagebyte = Encoding.ASCII.GetBytes(message);
+            var hmac = new HMACSHA512(ASCII.GetBytes(key));
+            var messagebyte = ASCII.GetBytes(message);
             var hashmessage = hmac.ComputeHash(messagebyte);
             return BitConverter.ToString(hashmessage).Replace("-", "");
         }
@@ -146,7 +148,7 @@ namespace ExchangeSharp
         public static string SHA512Sign(string message, byte[] key)
         {
             var hmac = new HMACSHA512(key);
-            var messagebyte = Encoding.ASCII.GetBytes(message);
+            var messagebyte = ASCII.GetBytes(message);
             var hashmessage = hmac.ComputeHash(messagebyte);
             return BitConverter.ToString(hashmessage).Replace("-", "");
         }
@@ -154,7 +156,7 @@ namespace ExchangeSharp
         public static string SHA512SignBase64(string message, byte[] key)
         {
             var hmac = new HMACSHA512(key);
-            var messagebyte = Encoding.ASCII.GetBytes(message);
+            var messagebyte = ASCII.GetBytes(message);
             var hashmessage = hmac.ComputeHash(messagebyte);
             return Convert.ToBase64String(hashmessage);
         }
@@ -276,7 +278,7 @@ namespace ExchangeSharp
             byte[] unprotectedBytes = ProtectedData.Unprotect(bytes, null, DataProtectionScope.CurrentUser);
 
             MemoryStream memory = new MemoryStream(unprotectedBytes);
-            BinaryReader reader = new BinaryReader(memory, Encoding.UTF8);
+            BinaryReader reader = new BinaryReader(memory, UTF8);
             SecureString current;
             int len;
             List<SecureString> strings = new List<SecureString>();
@@ -320,7 +322,7 @@ namespace ExchangeSharp
         public static void SaveUnprotectedStringsToFile(string path, string[] strings)
         {
             MemoryStream memory = new MemoryStream();
-            BinaryWriter writer = new BinaryWriter(memory, Encoding.UTF8);
+            BinaryWriter writer = new BinaryWriter(memory, UTF8);
             char[] chars;
 
             foreach (string s in strings)
