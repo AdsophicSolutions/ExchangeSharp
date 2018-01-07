@@ -1,0 +1,1 @@
+<Playlist Version="1.0"><Add Test="ExchangeSharpTest.OrderTests.TestGDAXOrders" /><Add Test="ExchangeSharpTest.OrderTests.TestKrakenOrders" /><Add Test="ExchangeSharpTest.OrderTests.TestGeminiOrders" /></Playlist>
